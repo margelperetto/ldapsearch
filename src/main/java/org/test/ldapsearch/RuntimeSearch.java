@@ -9,7 +9,7 @@ import org.test.ldapsearch.argsreader.ArgumentProperties;
 import org.test.ldapsearch.utils.LDAPSearchUtils;
 
 public class RuntimeSearch {
-
+    
     private ArgumentProperties prop;
 
     public RuntimeSearch(ArgumentProperties prop) {
@@ -28,10 +28,11 @@ public class RuntimeSearch {
     
     private void showResults(List<SearchResult> results) {
         try {
-            String[][] data = LDAPSearchUtils.getData(results, prop.getAttributes());
+            String[] attrs = prop.getAttributes();
+            String[][] data = LDAPSearchUtils.getData(results, attrs);
             
             CommandLineTable st = new CommandLineTable();
-            st.setHeaders(prop.getAttributes());
+            st.setHeaders(attrs);
             for (int i = 0; i < data.length; i++) {
                 st.addRow(data[i]);
             }
@@ -53,7 +54,7 @@ public class RuntimeSearch {
         String pathStr = prop.getPath();
         String filterStr = prop.getFilter();
         String[] attrs = prop.getAttributes();
-        int limit = prop.getLimit();
+        int limit = prop.getPageSize();
         return LDAPSearchUtils.getSearchResults(ctx, pathStr, filterStr, attrs, limit);
     }
 

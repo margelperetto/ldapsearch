@@ -45,7 +45,7 @@ public class App  {
         prop.setPath("DC=contoso,DC=local");
         prop.setFilter("(&(displayName=*)(objectClass=User))");
         prop.setAttrs("displayName|mail|samAccountName|department|title");
-        prop.setLimit(10);
+        prop.setPageSize(10);
         return prop;
     }
 

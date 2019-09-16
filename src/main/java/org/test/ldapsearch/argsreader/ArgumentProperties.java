@@ -9,7 +9,7 @@ public class ArgumentProperties {
 	private String filter;
 	private String path;
 	private String attrs;
-	private int limit;
+	private int pageSize;
 	private boolean forceSSL;
 	
     public String getUser() {
@@ -27,8 +27,8 @@ public class ArgumentProperties {
     public String getAttrs() {
         return this.attrs;
     }
-    public int getLimit() {
-        return this.limit;
+    public int getPageSize() {
+        return this.pageSize;
     }
     public void setUser(String user) {
         this.user = user;
@@ -45,8 +45,8 @@ public class ArgumentProperties {
     public void setAttrs(String attrs) {
         this.attrs = attrs;
     }
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
     public String getAddress() {
         return address;

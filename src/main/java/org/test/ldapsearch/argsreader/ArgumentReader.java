@@ -24,7 +24,7 @@ public class ArgumentReader {
 		options.addOption(new Option("f", "filter", true, "(&(displayName=*)(objectClass=User))"));
 		options.addOption(new Option("p", "path", true, "DC=contoso,DC=local"));
 		options.addOption(new Option("t", "attributes", true, "displayName|mail|samAccountName|department|title"));
-		options.addOption(new Option("l", "limit", true, "5"));
+		options.addOption(new Option("g", "pageSize", true, "1000"));
 		options.addOption(new Option("s", "forceSSL", true, "false"));
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
@@ -47,7 +47,7 @@ public class ArgumentReader {
 		String filter = cmd.getOptionValue("filter");
 		String path = cmd.getOptionValue("path");
 		String attrs = cmd.getOptionValue("attributes");
-		String limit = cmd.getOptionValue("limit");
+		String pageSize = cmd.getOptionValue("pageSize");
 		String forceSSL = cmd.getOptionValue("forceSSL");
 		
 		if(address!=null) properties.setAddress(address);
@@ -56,7 +56,7 @@ public class ArgumentReader {
 		if(filter!=null) properties.setFilter(filter);
 		if(path!=null) properties.setPath(path);
 		if(attrs!=null) properties.setAttrs(attrs);
-		if(limit!=null) properties.setLimit(Integer.parseInt(limit));
+		if(pageSize!=null) properties.setPageSize(Integer.parseInt(pageSize));
 		if(forceSSL!=null) properties.setForceSSL(Boolean.parseBoolean(forceSSL));
 	}
 }

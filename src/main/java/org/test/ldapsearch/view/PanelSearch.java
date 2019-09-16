@@ -36,7 +36,7 @@ public class PanelSearch extends JPanel{
     
     private JTextField jtfPath = new JTextField();
     private JTextArea jtaFilter = new JTextArea();
-    private JSpinner spLimit = new JSpinner(new SpinnerNumberModel(0, 0, 999999, 1));
+    private JSpinner spPageSize = new JSpinner(new SpinnerNumberModel(0, 0, 999999, 1));
     private JButton btnSearch = new JButton("Search!");
     private JButton btnAdd = new JButton("Add+");
     private JButton btnUp = new JButton("Up↑");
@@ -49,7 +49,7 @@ public class PanelSearch extends JPanel{
     private JLabel lbCount = new JLabel();
     private JLabel lbLastSearch = new JLabel();
     private AttributesManager attrManager = new AttributesManager(tableAttributtes);
-    private SearchPropManager propManager = new SearchPropManager(jtfPath, jtaFilter, spLimit, attrManager);
+    private SearchPropManager propManager = new SearchPropManager(jtfPath, jtaFilter, spPageSize, attrManager);
     
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private MainFrame frame;
@@ -78,14 +78,17 @@ public class PanelSearch extends JPanel{
         JLabel lbPath = new JLabel("Path");
         lbPath.setVerticalAlignment(JLabel.BOTTOM);
         
-        JPanel p1 = new JPanel(new MigLayout(new LC().insetsAll("0")));
+        JPanel pPage = new JPanel(new MigLayout(new LC().fillX().insets("0","0","5","0")));
+        pPage.add(new JLabel("Page Size"), new CC());
+        pPage.add(spPageSize, new CC());
+        
+        JPanel p1 = new JPanel(new MigLayout(new LC().fillX().insetsAll("0")));
         p1.add(lbPath, new CC().height(btnAdd.getPreferredSize().getHeight()+"!").spanX().wrap());
         p1.add(jtfPath, new CC().width("380:100%:").spanX().wrap());
         p1.add(new JLabel("Filter"), new CC().spanX().wrap());
         p1.add(scrollFilter, new CC().width("380:100%:").height("100%").grow().spanX().wrap());
-        p1.add(new JLabel("Limit"), new CC().wrap());
-        p1.add(spLimit, new CC());
-        p1.add(btnSearch, new CC().gapLeft("15").width("200::"));
+        p1.add(btnSearch, new CC().width("200::"));
+        p1.add(pPage, new CC().alignX("right"));
         
         JPanel p2 = new JPanel(new MigLayout(new LC().noGrid().fillX().insetsAll("0")));
         p2.add(btnAdd);
@@ -120,7 +123,7 @@ public class PanelSearch extends JPanel{
         String path = jtfPath.getText();
         String filter = jtaFilter.getText().replaceAll("\n", "");
         String[] attributes = attrManager.getAttributes();
-        int limit = (int) spLimit.getValue();
+        int limit = (int) spPageSize.getValue();
         
         btnSearch.setText("Searching...");
         btnSearch.setEnabled(false);

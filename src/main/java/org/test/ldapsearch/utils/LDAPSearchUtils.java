@@ -1,5 +1,6 @@
 package org.test.ldapsearch.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,13 +10,15 @@ import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
-import javax.naming.directory.SearchControls;
+import javax.naming.NamingException;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
-
+import javax.naming.ldap.PagedResultsResponseControl;
+import javax.naming.directory.SearchControls;
+import static javax.naming.directory.SearchControls.*;
 import org.test.ldapsearch.ssl.LdapSSLSocketFactory;
 
 public final class LDAPSearchUtils {
@@ -52,34 +55,60 @@ public final class LDAPSearchUtils {
         return ldapURL.toLowerCase().trim().startsWith("ldaps:");
     }
 
-    public static List<SearchResult> getSearchResults(LdapContext ctx, String pathStr, String filterStr, String[] attributes, int limit) {
+    public static List<SearchResult> getSearchResults(LdapContext ctx, String pathStr, String filterStr, String[] attributes, int pageSize) {
         try {
             System.out.println("Searching...");
             System.out.println("Path: "+pathStr);
             System.out.println("Filter: "+filterStr);
             System.out.println("Attrs: "+Arrays.asList(attributes));
-            System.out.println("Limit: "+limit);
+            System.out.println("Page Size: "+pageSize);
             
             List<SearchResult> results = new ArrayList<>();
             String[] paths = LDAPSearchUtils.breakPaths(pathStr);
+            String filter = filterStr.replaceAll("\n", "");
+            int scope = paths.length==1?SUBTREE_SCOPE:ONELEVEL_SCOPE;
+            
+            SearchControls searchCtls = new SearchControls();
+            searchCtls.setSearchScope(scope);
+            searchCtls.setReturningAttributes(attributes);
+            
             for (String path : paths) {
-                String filter = filterStr.replaceAll("\n", "");
-                
-                SearchControls searchCtls = new SearchControls();
-                searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-                searchCtls.setReturningAttributes(attributes);
-                Control[] ctls = new Control[]{new PagedResultsControl(limit, true)};
-                ctx.setRequestControls(ctls);
-                NamingEnumeration<SearchResult> enumerations = ctx.search(path, filter, searchCtls);
-                while (enumerations.hasMoreElements()) {
-                    results.add(enumerations.nextElement());
-                }
+                byte[] cookie = null;
+                int pageCount = 0;
+                do {
+                    ctx.setRequestControls(new Control[]{createPageCtrls(cookie, pageSize)});
+                    NamingEnumeration<SearchResult> enumerations = ctx.search(path, filter, searchCtls);
+                    while (enumerations.hasMoreElements()) {
+                        results.add(enumerations.nextElement());
+                    }
+                    System.out.println("Page: "+(++pageCount)+" -> '"+path+"' Results: "+results.size());
+                } while ((cookie = getCookie(ctx))!=null);
             }
             System.out.println("Search done! Results-> "+results.size()+"\n");
             return results;
         }catch (Exception e) {
             System.err.println("Search fail!\n");
             throw new RuntimeException("Search error! "+e.getMessage(), e);
+        }
+    }
+    
+    private static Control createPageCtrls(byte[] cookie, int limit) throws IOException {
+        return cookie==null?new PagedResultsControl(limit, true):new PagedResultsControl(limit, cookie, true);
+    }
+
+    public static byte[] getCookie(LdapContext ctx) {
+        try {
+            Control[] controls = ctx.getResponseControls();
+            if (controls != null) {
+                for (Control ctrl : controls) {
+                    if (ctrl instanceof PagedResultsResponseControl) {
+                        return ((PagedResultsResponseControl) ctrl).getCookie();
+                    }
+                }
+            }
+            return null;
+        } catch (NamingException e) {
+            throw new RuntimeException("Error verify has more pages! ", e);
         }
     }
 
