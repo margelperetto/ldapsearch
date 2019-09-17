@@ -5,8 +5,8 @@ import java.util.Base64;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.test.ldapsearch.view.PropertiesUtils;
-import org.test.ldapsearch.view.PropertiesUtils.Prop;
+import org.test.ldapsearch.utils.PropertiesUtils;
+import org.test.ldapsearch.utils.PropertiesUtils.Prop;
 
 public class LoginPropManager {
     

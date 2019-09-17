@@ -95,6 +95,7 @@ public class PanelLogin extends JPanel{
        jtfUser.setEnabled(b);
        jtfPass.setEnabled(b);
        btnLogin.setEnabled(b);
+       ckbForceSSL.setEnabled(b);
        btnLogin.setText(b?"Connect":"Connecting...");
     }
 

@@ -1,4 +1,4 @@
-package org.test.ldapsearch.view;
+package org.test.ldapsearch.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,12 +7,15 @@ import java.util.Properties;
 
 public class PropertiesUtils {
 
-	private static final String PROP_FILE = System.getProperty("user.home")+File.separator+"conf_ldapsearch.properties";
+	private static final String PROP_FILE = System.getProperty("user.home")+File.separator+".ldapsearch"+File.separator+"conf_ldapsearch.properties";
 	private static final Properties PROPERTIES = new Properties();
 	
 	public static void loadProperties() throws Exception{
-		if(new File(PROP_FILE).exists()){
+		File confFile = new File(PROP_FILE);
+        if(confFile .exists()){
 			PROPERTIES.load(new FileInputStream(PROP_FILE));
+		}else {
+		    confFile.getParentFile().mkdir();
 		}
 	}
 	

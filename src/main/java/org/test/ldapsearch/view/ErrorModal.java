@@ -37,6 +37,7 @@ public class ErrorModal extends JDialog{
         add(new JLabel("Details:"), new CC().gapTop("15"));
         add(new JScrollPane(jtaDetails), new CC().grow().height("0:100%:"));
         add(btn, new CC().alignX("right"));
+        getRootPane().setDefaultButton(btn);
         
         setTitle("Error");
         setSize(800, 600);

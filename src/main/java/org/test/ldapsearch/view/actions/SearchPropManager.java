@@ -5,8 +5,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import org.test.ldapsearch.view.PropertiesUtils;
-import org.test.ldapsearch.view.PropertiesUtils.Prop;
+import org.test.ldapsearch.utils.PropertiesUtils;
+import org.test.ldapsearch.utils.PropertiesUtils.Prop;
 
 public class SearchPropManager {
     
