@@ -1,5 +1,8 @@
 package org.test.ldapsearch.utils;
 
+import static javax.naming.directory.SearchControls.ONELEVEL_SCOPE;
+import static javax.naming.directory.SearchControls.SUBTREE_SCOPE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,18 +10,19 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntConsumer;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
-import javax.naming.directory.SearchControls;
-import static javax.naming.directory.SearchControls.*;
+
 import org.test.ldapsearch.ssl.LdapSSLSocketFactory;
 
 public final class LDAPSearchUtils {
@@ -56,6 +60,10 @@ public final class LDAPSearchUtils {
     }
 
     public static List<SearchResult> getSearchResults(LdapContext ctx, String pathStr, String filterStr, String[] attributes, int pageSize) {
+        return getSearchResults(ctx, pathStr, filterStr, attributes, pageSize, null);
+    }
+    
+    public static List<SearchResult> getSearchResults(LdapContext ctx, String pathStr, String filterStr, String[] attributes, int pageSize, IntConsumer pagedResultsCounter) {
         try {
             System.out.println("Searching...");
             System.out.println("Path: "+pathStr);
@@ -81,6 +89,7 @@ public final class LDAPSearchUtils {
                     while (enumerations.hasMoreElements()) {
                         results.add(enumerations.nextElement());
                     }
+                    if(pagedResultsCounter!=null) pagedResultsCounter.accept(results.size());
                     System.out.println("Page: "+(++pageCount)+" -> '"+path+"' Results: "+results.size());
                 } while ((cookie = getCookie(ctx))!=null);
             }

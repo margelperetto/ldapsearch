@@ -3,6 +3,7 @@ package org.test.ldapsearch.view.actions;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -13,12 +14,15 @@ public class CollumnOrderingMouseListener extends MouseAdapter{
 
     private final JTable table;
     private final DefaultTableModel model;
+    private final Collator collator;
     private int lastColOrder = -1;
     private Point mousePoint;
     
     public CollumnOrderingMouseListener(JTable table){
         this.table = table;
         this.model = (DefaultTableModel) table.getModel();
+        collator = Collator.getInstance();
+        collator.setStrength(Collator.PRIMARY);
     }
     
     @Override
@@ -50,10 +54,10 @@ public class CollumnOrderingMouseListener extends MouseAdapter{
             String v2 = o2.get(col);
             if(reverse) {
                 lastColOrder = -1;
-                return v2.compareTo(v1);
+                return collator.compare(v2 ,v1);
             } else {
                 lastColOrder = col;
-                return v1.compareTo(v2);
+                return collator.compare(v1 ,v2);
             }
         });
         lastColOrder = reverse ? -1 : col;

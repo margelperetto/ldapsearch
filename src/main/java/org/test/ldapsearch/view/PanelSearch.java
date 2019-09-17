@@ -82,31 +82,31 @@ public class PanelSearch extends JPanel{
         pPage.add(new JLabel("Page Size"), new CC());
         pPage.add(spPageSize, new CC());
         
-        JPanel p1 = new JPanel(new MigLayout(new LC().fillX().insetsAll("0")));
-        p1.add(lbPath, new CC().height(btnAdd.getPreferredSize().getHeight()+"!").spanX().wrap());
-        p1.add(jtfPath, new CC().width("380:100%:").spanX().wrap());
-        p1.add(new JLabel("Filter"), new CC().spanX().wrap());
-        p1.add(scrollFilter, new CC().width("380:100%:").height("100%").grow().spanX().wrap());
-        p1.add(btnSearch, new CC().width("200::"));
-        p1.add(pPage, new CC().alignX("right"));
+        JPanel panelPathAndFilter = new JPanel(new MigLayout(new LC().fillX().insetsAll("0")));
+        panelPathAndFilter.add(lbPath, new CC().height(btnAdd.getPreferredSize().getHeight()+"!").spanX().wrap());
+        panelPathAndFilter.add(jtfPath, new CC().width("380:100%:").spanX().wrap());
+        panelPathAndFilter.add(new JLabel("Filter"), new CC().spanX().wrap());
+        panelPathAndFilter.add(scrollFilter, new CC().width("380:100%:").height("100%").grow().spanX().wrap());
+        panelPathAndFilter.add(btnSearch, new CC().width("220::"));
+        panelPathAndFilter.add(pPage, new CC().alignX("right"));
         
-        JPanel p2 = new JPanel(new MigLayout(new LC().noGrid().fillX().insetsAll("0")));
-        p2.add(btnAdd);
-        p2.add(btnRemove);
-        p2.add(new JLabel(" "), new CC().width("0:100%:"));
-        p2.add(btnUp);
-        p2.add(btnDown, new CC().wrap());
-        p2.add(new JScrollPane(tableAttributtes), new CC().spanX().grow().gapBottom("5"));
+        JPanel panelAttrs = new JPanel(new MigLayout(new LC().noGrid().fillX().insetsAll("0")));
+        panelAttrs.add(btnAdd);
+        panelAttrs.add(btnRemove);
+        panelAttrs.add(new JLabel(" "), new CC().width("0:100%:"));
+        panelAttrs.add(btnUp);
+        panelAttrs.add(btnDown, new CC().wrap());
+        panelAttrs.add(new JScrollPane(tableAttributtes), new CC().spanX().grow().gapBottom("5"));
         
-        JPanel p3 = new JPanel(new MigLayout(new LC().fillX().insetsAll("0")));
-        p3.add(lbLastSearch);
-        p3.add(lbCount, new CC().alignX("right"));
+        JPanel panelCount = new JPanel(new MigLayout(new LC().fillX().insetsAll("0")));
+        panelCount.add(lbLastSearch);
+        panelCount.add(lbCount, new CC().alignX("right"));
         
         setLayout(new MigLayout(new LC().fill().gridGap("10","5")));
-        add(p1, new CC().grow().width("100%"));
-        add(p2, new CC().grow().minWidth("300").wrap());
-        add(new JScrollPane(tableResults), new CC().width("500:100%:").height("300:100%:").spanX().wrap());
-        add(p3, new CC().spanX().growX());
+        add(panelPathAndFilter, new CC().grow().width("100%"));
+        add(panelAttrs, new CC().grow().minWidth("300").wrap());
+        add(new JScrollPane(tableResults), new CC().width("500:100%:").height("100:100%:").spanX().wrap());
+        add(panelCount, new CC().spanX().growX());
         
         propManager.loadProperties();
     }
@@ -127,10 +127,14 @@ public class PanelSearch extends JPanel{
         
         btnSearch.setText("Searching...");
         btnSearch.setEnabled(false);
-        new SwingWorker<List<SearchResult>, Void>() {
+        new SwingWorker<List<SearchResult>, Integer>() {
             @Override
             protected List<SearchResult> doInBackground() throws Exception {
-                return LDAPSearchUtils.getSearchResults(ctx, path , filter, attributes, limit);
+                return LDAPSearchUtils.getSearchResults(ctx, path , filter, attributes, limit, this::publish);
+            }
+            @Override
+            protected void process(List<Integer> chunks) {
+                btnSearch.setText("Searching... ("+chunks.get(chunks.size()-1)+" results)");
             }
             @Override
             protected void done() {
