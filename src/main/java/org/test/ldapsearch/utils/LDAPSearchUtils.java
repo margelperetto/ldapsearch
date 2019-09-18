@@ -128,17 +128,7 @@ public final class LDAPSearchUtils {
             System.out.println("USER: "+user);
             System.out.println("PASS: "+new String(new char[pass.length()]).replace("\0", "*"));
             
-            Map<Object, Object> map = new HashMap<>();
-            map.put(Context.SECURITY_PRINCIPAL, user);
-            map.put(Context.SECURITY_CREDENTIALS, pass);
-            map.put(Context.PROVIDER_URL, ldapURL);
-            map.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-            map.put(Context.SECURITY_AUTHENTICATION, "simple");
-            map.put("java.naming.ldap.attributes.binary", "objectGUID");
-            if(forceSSL || LDAPSearchUtils.usingSSL(ldapURL)) {
-                map.put(Context.SECURITY_PROTOCOL, "ssl");
-                map.put("java.naming.ldap.factory.socket", LdapSSLSocketFactory.class.getName());
-            }
+            Map<Object, Object> map = createLDAPAuthMap(ldapURL, user, pass, forceSSL);
             InitialLdapContext ctx = new InitialLdapContext(new Hashtable<>(map), null);
             System.out.println("Connected!\n");
             return ctx;
@@ -148,6 +138,21 @@ public final class LDAPSearchUtils {
         }
     }
     
+    public static Map<Object, Object> createLDAPAuthMap(String ldapURL, String user, String pass, boolean forceSSL) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put(Context.SECURITY_PRINCIPAL, user);
+        map.put(Context.SECURITY_CREDENTIALS, pass);
+        map.put(Context.PROVIDER_URL, ldapURL);
+        map.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        map.put(Context.SECURITY_AUTHENTICATION, "simple");
+        map.put("java.naming.ldap.attributes.binary", "objectGUID");
+        if(forceSSL || LDAPSearchUtils.usingSSL(ldapURL)) {
+            map.put(Context.SECURITY_PROTOCOL, "ssl");
+            map.put("java.naming.ldap.factory.socket", LdapSSLSocketFactory.class.getName());
+        }
+        return map;
+    }
+
     public static Object getValue(List<SearchResult> results, String[] attributes, int r, int c) {
         try {
             return results.get(r).getAttributes().get(attributes[c]).get();
