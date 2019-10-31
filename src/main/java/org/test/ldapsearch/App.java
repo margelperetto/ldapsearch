@@ -13,6 +13,7 @@ public class App  {
     private static final String KEY_STORE = "javax.net.ssl.keyStore";
     private static final String TRUST_STORE = "javax.net.ssl.trustStore";
     private static final String JAVA_HOME = "java.home";
+    public static final String DISABLE_ENDPOINT_VERIFICATION = "com.sun.jndi.ldap.object.disableEndpointIdentification";
 
     public static void main( String[] args ) {
         setSSLProperties();
@@ -71,12 +72,22 @@ public class App  {
         }else {
             System.err.println("'"+cacertsFile+"' not found!");
         }
-        System.setProperty("com.sun.jndi.ldap.object.disableEndpointIdentification", "true");
+        String disableEndpointIdentification = System.getProperty(DISABLE_ENDPOINT_VERIFICATION);
+        if(disableEndpointIdentification == null) {
+            System.setProperty(DISABLE_ENDPOINT_VERIFICATION, "true");
+            System.out.println("Set '"+DISABLE_ENDPOINT_VERIFICATION+"' = true");
+        }else {
+            System.out.println(DISABLE_ENDPOINT_VERIFICATION+": "+disableEndpointIdentification);
+        }
         
         System.out.println("-----------------------------------------------------------------------------------");
         System.out.println(JAVA_HOME+":                "+System.getProperty(JAVA_HOME));
         System.out.println(KEY_STORE+":   "+System.getProperty(KEY_STORE));
         System.out.println(TRUST_STORE+": "+System.getProperty(TRUST_STORE));
         System.out.println("-----------------------------------------------------------------------------------\n");
+    }
+
+    public static boolean isEndpointVerificationDisabled() {
+        return "true".equals(System.getProperty(App.DISABLE_ENDPOINT_VERIFICATION));
     }
 }

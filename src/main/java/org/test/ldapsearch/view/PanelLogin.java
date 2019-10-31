@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.LineBorder;
 
+import org.test.ldapsearch.App;
 import org.test.ldapsearch.utils.LDAPSearchUtils;
 import org.test.ldapsearch.view.actions.LoginPropManager;
 
@@ -28,6 +29,7 @@ public class PanelLogin extends JPanel{
     private JTextField jtfUser = new JTextField("administrator");
     private JPasswordField jtfPass = new JPasswordField("con");
     private JCheckBox ckbForceSSL = new JCheckBox("Force SSL");
+    private JCheckBox ckbEndpointVerifDisabled = new JCheckBox("Endpoint verification disabled");
     private JButton btnLogin = new JButton("Connect");
     private MainFrame frame;
     private Consumer<LdapContext> consumer;
@@ -45,6 +47,10 @@ public class PanelLogin extends JPanel{
         btnLogin.addActionListener(evt->login());
         jtfPass.addActionListener(evt->login());
         ckbForceSSL.setToolTipText("LDAPS protocol uses SSL by default");
+        ckbEndpointVerifDisabled.setSelected(App.isEndpointVerificationDisabled());
+        ckbEndpointVerifDisabled.setToolTipText("Change system property: '"+App.DISABLE_ENDPOINT_VERIFICATION+"'");
+        ckbEndpointVerifDisabled.addActionListener(evt->
+            System.setProperty(App.DISABLE_ENDPOINT_VERIFICATION, String.valueOf(ckbEndpointVerifDisabled.isSelected())));
         
         JPanel panel = new JPanel(new MigLayout(new LC().wrapAfter(1).insetsAll("15").fill()));
         panel.setBorder(new LineBorder(Color.GRAY));
@@ -54,7 +60,8 @@ public class PanelLogin extends JPanel{
         panel.add(jtfUser, new CC().growX().gapBottom("15"));
         panel.add(new JLabel("PASSWORD"));
         panel.add(jtfPass, new CC().growX().gapBottom("15"));
-        panel.add(ckbForceSSL, new CC().growX());
+        panel.add(ckbForceSSL, new CC().split().spanX());
+        panel.add(ckbEndpointVerifDisabled, new CC().alignX("right").wrap());
         panel.add(btnLogin, new CC().alignX("center"));
         
         setOpaque(true);
@@ -96,6 +103,7 @@ public class PanelLogin extends JPanel{
        jtfPass.setEnabled(b);
        btnLogin.setEnabled(b);
        ckbForceSSL.setEnabled(b);
+       ckbEndpointVerifDisabled.setEnabled(b);
        btnLogin.setText(b?"Connect":"Connecting...");
     }
 

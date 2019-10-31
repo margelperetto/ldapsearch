@@ -23,6 +23,7 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 
+import org.test.ldapsearch.App;
 import org.test.ldapsearch.ssl.LdapSSLSocketFactory;
 
 public final class LDAPSearchUtils {
@@ -123,7 +124,7 @@ public final class LDAPSearchUtils {
 
     public static LdapContext connect(String ldapURL, String user, String pass, boolean forceSSL) {
         try {
-            System.out.println("Connecting...");
+            System.out.println("Connecting... "+(App.isEndpointVerificationDisabled()?"(Endpoint verification disabled)":""));
             System.out.println("URL: "+ldapURL);
             System.out.println("USER: "+user);
             System.out.println("PASS: "+new String(new char[pass.length()]).replace("\0", "*"));
