@@ -68,9 +68,11 @@ public class MainFrame extends JFrame{
 		        closeConnection();
 		    }
 		});
+		
+		setJMenuBar(new MenuBar(this));
 	}
 	
-	private void closeConnection() {
+    private void closeConnection() {
 	    try {
             if(ctx!=null) {
                 ctx.close();

@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class PropertiesUtils {
 
-	private static final String PROP_FILE = System.getProperty("user.home")+File.separator+".ldapsearch"+File.separator+"conf_ldapsearch.properties";
+	public static final String PROP_FILE = System.getProperty("user.home")+File.separator+".ldapsearch"+File.separator+"conf_ldapsearch.properties";
 	private static final Properties PROPERTIES = new Properties();
 	
 	public static void loadProperties() throws Exception{
