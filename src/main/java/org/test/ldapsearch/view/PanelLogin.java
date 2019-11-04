@@ -68,8 +68,6 @@ public class PanelLogin extends JPanel{
         setBackground(Color.LIGHT_GRAY);
         setLayout(new GridBagLayout());
         add(panel);
-        
-        propManager.loadProperties();
     }
     
     private void login() {
@@ -115,4 +113,11 @@ public class PanelLogin extends JPanel{
         return jtfUser.getText();
     }
     
+    public void reload() {
+        propManager.loadProperties();
+    }
+
+    public void save() {
+        propManager.saveProperties();
+    }
 }

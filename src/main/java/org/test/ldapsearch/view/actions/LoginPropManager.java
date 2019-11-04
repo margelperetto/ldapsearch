@@ -5,8 +5,8 @@ import java.util.Base64;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.test.ldapsearch.utils.PropertiesUtils;
-import org.test.ldapsearch.utils.PropertiesUtils.Prop;
+import org.test.ldapsearch.storage.PropInfos;
+import org.test.ldapsearch.storage.PropertiesStorage;
 
 public class LoginPropManager {
     
@@ -22,11 +22,10 @@ public class LoginPropManager {
 
     public void loadProperties() {
         try {
-            PropertiesUtils.loadProperties();
-            setProp(jtfUrl, Prop.URL);
-            setProp(jtfUser, Prop.USER);
+            setProp(jtfUrl, PropInfos.URL);
+            setProp(jtfUser, PropInfos.USER);
             
-            String pass = PropertiesUtils.getProp(Prop.PASS);
+            String pass = PropertiesStorage.getInstance().getProp(PropInfos.PASS);
             if(pass!=null && !pass.trim().isEmpty()){
                 jtfPass.setText(new String(Base64.getDecoder().decode(pass.trim())));
             }
@@ -35,8 +34,8 @@ public class LoginPropManager {
         }
     }
     
-    private void setProp(JTextField jtf, Prop prop) {
-        String value = PropertiesUtils.getProp(prop);
+    private void setProp(JTextField jtf, PropInfos prop) {
+        String value = PropertiesStorage.getInstance().getProp(prop);
         if(value!=null && !value.trim().isEmpty()){
             jtf.setText(value.trim());
         }
@@ -44,12 +43,12 @@ public class LoginPropManager {
 
     public void saveProperties() {
         try {
-            PropertiesUtils.setProp(Prop.URL, jtfUrl.getText());
-            PropertiesUtils.setProp(Prop.USER, jtfUser.getText());
+            PropertiesStorage.getInstance().setProp(PropInfos.URL, jtfUrl.getText());
+            PropertiesStorage.getInstance().setProp(PropInfos.USER, jtfUser.getText());
             String plain = String.valueOf(jtfPass.getPassword());
             String encoded = Base64.getEncoder().encodeToString(plain.getBytes());
-            PropertiesUtils.setProp(Prop.PASS, encoded);
-            PropertiesUtils.saveProperties();
+            PropertiesStorage.getInstance().setProp(PropInfos.PASS, encoded);
+            PropertiesStorage.getInstance().saveProperties();
         } catch (Exception e) {
             e.printStackTrace();
         }

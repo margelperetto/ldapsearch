@@ -108,4 +108,10 @@ public class AttributesManager{
     public int getRowCount() {
         return tableAttributtes.getRowCount();
     }
+
+    public void clear() {
+        while(tmAttributes.getRowCount()>0) {
+            tmAttributes.removeRow(0);
+        }
+    }
 }

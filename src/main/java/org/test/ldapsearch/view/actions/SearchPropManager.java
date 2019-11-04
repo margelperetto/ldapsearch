@@ -5,8 +5,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import org.test.ldapsearch.utils.PropertiesUtils;
-import org.test.ldapsearch.utils.PropertiesUtils.Prop;
+import org.test.ldapsearch.storage.PropInfos;
+import org.test.ldapsearch.storage.PropertiesStorage;
 
 public class SearchPropManager {
     
@@ -22,8 +22,8 @@ public class SearchPropManager {
         this.attrManager = attrManager;
     }
 
-    private void setProp(JTextComponent jtf, Prop prop, String defaultValue) {
-        String value = PropertiesUtils.getProp(prop);
+    private void setProp(JTextComponent jtf, PropInfos prop, String defaultValue) {
+        String value = PropertiesStorage.getInstance().getProp(prop);
         if(value!=null && !value.trim().isEmpty()){
             jtf.setText(value.trim());
         } else {
@@ -33,11 +33,11 @@ public class SearchPropManager {
 
     public void saveProperties() {
         try {
-            PropertiesUtils.setProp(Prop.PATH, jtfPath.getText());
-            PropertiesUtils.setProp(Prop.FILTER, jtaFilter.getText());
-            PropertiesUtils.setProp(Prop.LIMIT, spLimit.getValue().toString());
-            PropertiesUtils.setPropArray(Prop.ATTRIBUTES, attrManager.getAttributes());
-            PropertiesUtils.saveProperties();
+            PropertiesStorage.getInstance().setProp(PropInfos.PATH, jtfPath.getText());
+            PropertiesStorage.getInstance().setProp(PropInfos.FILTER, jtaFilter.getText());
+            PropertiesStorage.getInstance().setProp(PropInfos.LIMIT, spLimit.getValue().toString());
+            PropertiesStorage.getInstance().setPropArray(PropInfos.ATTRIBUTES, attrManager.getAttributes());
+            PropertiesStorage.getInstance().saveProperties();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,11 +45,11 @@ public class SearchPropManager {
     
     public void loadProperties() {
         try {
-            PropertiesUtils.loadProperties();
-            setProp(jtfPath, Prop.PATH, "DC=contoso,DC=local");
-            setProp(jtaFilter, Prop.FILTER, "(&(displayName=*)(objectClass=User))");
-            spLimit.setValue(PropertiesUtils.getPropInt(Prop.LIMIT, 1000));
-            for(String row : PropertiesUtils.getPropArray(Prop.ATTRIBUTES)) {
+            setProp(jtfPath, PropInfos.PATH, "DC=contoso,DC=local");
+            setProp(jtaFilter, PropInfos.FILTER, "(&(displayName=*)(objectClass=User))");
+            spLimit.setValue(PropertiesStorage.getInstance().getPropInt(PropInfos.LIMIT, 1000));
+            attrManager.clear();
+            for(String row : PropertiesStorage.getInstance().getPropArray(PropInfos.ATTRIBUTES)) {
                 attrManager.addRow(row);
             }
             if(attrManager.getRowCount()==0) {

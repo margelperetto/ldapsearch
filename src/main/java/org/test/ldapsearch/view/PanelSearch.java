@@ -42,12 +42,12 @@ public class PanelSearch extends JPanel{
     private JButton btnUp = new JButton("Up↑");
     private JButton btnDown = new JButton("Down↓");
     private JButton btnRemove = new JButton("Remove-");
-    private DefaultTableModel tmAttributes = new DefaultTableModel();
-    private JTable tableAttributtes = new JTable(tmAttributes);
-    private DefaultTableModel tmResults = new DefaultTableModel();
-    private JTable tableResults = new JTable(tmResults);
     private JLabel lbCount = new JLabel();
     private JLabel lbLastSearch = new JLabel();
+    private DefaultTableModel tmResults = new DefaultTableModel();
+    private JTable tableResults = new JTable(tmResults);
+    private DefaultTableModel tmAttributes = new DefaultTableModel();
+    private JTable tableAttributtes = new JTable(tmAttributes);
     private AttributesManager attrManager = new AttributesManager(tableAttributtes);
     private SearchPropManager propManager = new SearchPropManager(jtfPath, jtaFilter, spPageSize, attrManager);
     
@@ -107,10 +107,12 @@ public class PanelSearch extends JPanel{
         add(panelAttrs, new CC().grow().minWidth("300").wrap());
         add(new JScrollPane(tableResults), new CC().width("500:100%:").height("100:100%:").spanX().wrap());
         add(panelCount, new CC().spanX().growX());
-        
-        propManager.loadProperties();
     }
     
+    public void reload() {
+        propManager.loadProperties();
+    }
+
     public void setLdapContext(LdapContext ctx) {
         this.ctx = ctx;
     }
@@ -173,6 +175,10 @@ public class PanelSearch extends JPanel{
         }catch (Exception e) {
             throw new RuntimeException("Error show results! "+e.getMessage(), e);
         }
+    }
+
+    public void save() {
+        propManager.saveProperties();
     }
 
 }

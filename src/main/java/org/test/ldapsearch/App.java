@@ -2,10 +2,14 @@ package org.test.ldapsearch;
 
 import java.io.File;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.test.ldapsearch.argsreader.ArgumentProperties;
 import org.test.ldapsearch.argsreader.ArgumentReader;
+import org.test.ldapsearch.storage.ConfigFileStorage;
+import org.test.ldapsearch.storage.PropFileConfig;
+import org.test.ldapsearch.storage.PropertiesStorage;
 import org.test.ldapsearch.view.MainFrame;
 
 public class App  {
@@ -53,9 +57,12 @@ public class App  {
     private static void openGraphicInterface() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            String file = ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE);
+            PropertiesStorage.setInstance(file);
             new MainFrame().setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
