@@ -25,9 +25,9 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class PanelLogin extends JPanel{
 
-    private JTextField jtfUrl = new JTextField("ldap://contoso.local");
-    private JTextField jtfUser = new JTextField("administrator");
-    private JPasswordField jtfPass = new JPasswordField("con");
+    private JTextField jtfUrl = new JTextField();
+    private JTextField jtfUser = new JTextField();
+    private JPasswordField jtfPass = new JPasswordField();
     private JCheckBox ckbForceSSL = new JCheckBox("Force SSL");
     private JCheckBox ckbEndpointVerifDisabled = new JCheckBox("Endpoint verification disabled");
     private JButton btnLogin = new JButton("Connect");

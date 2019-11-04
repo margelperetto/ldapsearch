@@ -22,22 +22,26 @@ public class LoginPropManager {
 
     public void loadProperties() {
         try {
-            setProp(jtfUrl, PropInfos.URL);
-            setProp(jtfUser, PropInfos.USER);
+            setProp(jtfUrl, PropInfos.URL, "ldap://contoso.local");
+            setProp(jtfUser, PropInfos.USER, "administrator");
             
             String pass = PropertiesStorage.getInstance().getProp(PropInfos.PASS);
             if(pass!=null && !pass.trim().isEmpty()){
                 jtfPass.setText(new String(Base64.getDecoder().decode(pass.trim())));
+            } else {
+                jtfPass.setText("con");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    private void setProp(JTextField jtf, PropInfos prop) {
+    private void setProp(JTextField jtf, PropInfos prop, String defaultProp) {
         String value = PropertiesStorage.getInstance().getProp(prop);
         if(value!=null && !value.trim().isEmpty()){
             jtf.setText(value.trim());
+        } else {
+            jtf.setText(defaultProp);
         }
     }
 
