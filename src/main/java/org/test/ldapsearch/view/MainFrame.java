@@ -18,6 +18,7 @@ import javax.swing.JSeparator;
 
 import org.test.ldapsearch.storage.ConfigFileStorage;
 import org.test.ldapsearch.storage.PropFileConfig;
+import org.test.ldapsearch.storage.PropertiesStorage;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
@@ -113,7 +114,8 @@ public class MainFrame extends JFrame{
 
     public void updateTitle() {
         try {
-            setTitle("LDAP Query Tool - "+ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE));
+            String configFile = ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE);
+            setTitle("LDAP Query Tool - "+(configFile==null?PropertiesStorage.DEFAULT_PROP_FILE:configFile));
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getMessage());
