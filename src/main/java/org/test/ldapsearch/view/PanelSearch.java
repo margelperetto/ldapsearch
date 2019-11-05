@@ -62,7 +62,7 @@ public class PanelSearch extends JPanel{
         jtaFilter.setWrapStyleWord(true);
         jtaFilter.setLineWrap(true);
         jtfPath.setFont(jtaFilter.getFont());
-        jtfPath.setBorder(scrollFilter.getBorder());
+        scrollFilter.setBorder(jtfPath.getBorder());
         tmAttributes.addColumn("Atributes");
         
         btnSearch.addActionListener(evt->search());
