@@ -46,7 +46,7 @@ public class SearchPropManager {
     public void loadProperties() {
         try {
             setProp(jtfPath, PropInfos.PATH, "DC=contoso,DC=local");
-            setProp(jtaFilter, PropInfos.FILTER, "(&(displayName=*)(objectClass=User))");
+            setProp(jtaFilter, PropInfos.FILTER, "(&(displayName=*)(objectClass=User)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))");
             spLimit.setValue(PropertiesStorage.getInstance().getPropInt(PropInfos.LIMIT, 1000));
             attrManager.clear();
             for(String row : PropertiesStorage.getInstance().getPropArray(PropInfos.ATTRIBUTES)) {
