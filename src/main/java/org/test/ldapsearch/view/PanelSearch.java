@@ -75,6 +75,8 @@ public class PanelSearch extends JPanel{
         
         tableResults.getTableHeader().addMouseListener(new CollumnOrderingMouseListener(tableResults));
         
+        spPageSize.setEditor(new JSpinner.NumberEditor(spPageSize, "0"));
+        
         JLabel lbPath = new JLabel("Path");
         lbPath.setVerticalAlignment(JLabel.BOTTOM);
         

@@ -1,5 +1,6 @@
 package org.test.ldapsearch.view;
 
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -10,11 +11,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 
 import org.test.ldapsearch.storage.ConfigFileStorage;
 import org.test.ldapsearch.storage.PropFileConfig;
@@ -24,13 +27,18 @@ import org.test.ldapsearch.storage.PropertiesStorage;
 public class MenuBar extends JMenuBar{
 
     private MainFrame mainFrame;
-    private JMenu menuFile = new JMenu("File");
+    private JMenu menuFile = new JMenu("File   ");
+    private JMenu menuHelp = new JMenu("Help   ");
     private Set<String> filesHistory;
 
     public MenuBar(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+        
         reloadMenuFileItens();
         add(menuFile);
+        
+        menuHelp.add(menuItem("About LDAP Query Tool", evt->showAbout()));
+        add(menuHelp);
     }
     
     private void reloadMenuFileItens() {
@@ -205,4 +213,17 @@ public class MenuBar extends JMenuBar{
         return menuItem;
     }
     
+    private void showAbout() {
+        String msg = "LDAP Query Tool \n\n"
+                + "Version: \n"
+                + "    0.1-beta \n\n"
+                + "Developer: \n"
+                + "    margel.peretto@gmail.com";
+        JTextArea jta = new JTextArea(msg );
+        jta.setFont(new JLabel().getFont());
+        jta.setOpaque(false);
+        jta.setEditable(false);
+        jta.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        JOptionPane.showMessageDialog(mainFrame, jta, "About", JOptionPane.INFORMATION_MESSAGE);
+    }
 }
