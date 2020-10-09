@@ -1,5 +1,6 @@
 package org.test.ldapsearch;
 
+import java.io.PrintStream;
 import java.util.List;
 
 import javax.naming.directory.SearchResult;
@@ -27,11 +28,14 @@ public class RuntimeSearch {
     }
     
     private void showResults(List<SearchResult> results) {
+    	showResults(System.out, results, prop.getAttributes());
+    }
+    
+    public static void showResults(PrintStream out, List<SearchResult> results, String[] attrs) {
         try {
-            String[] attrs = prop.getAttributes();
             String[][] data = LDAPSearchUtils.getData(results, attrs);
             
-            CommandLineTable st = new CommandLineTable();
+            CommandLineTable st = new CommandLineTable(out);
             st.setHeaders(attrs);
             for (int i = 0; i < data.length; i++) {
                 st.addRow(data[i]);

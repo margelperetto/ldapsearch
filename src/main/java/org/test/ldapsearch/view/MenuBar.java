@@ -216,7 +216,7 @@ public class MenuBar extends JMenuBar{
     private void showAbout() {
         String msg = "LDAP Query Tool \n\n"
                 + "Version: \n"
-                + "    0.1-beta \n\n"
+                + "    0.2-beta \n\n"
                 + "Developer: \n"
                 + "    margel.peretto@gmail.com";
         JTextArea jta = new JTextArea(msg );

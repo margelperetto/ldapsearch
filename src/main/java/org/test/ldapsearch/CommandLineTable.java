@@ -1,5 +1,6 @@
 package org.test.ldapsearch;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,8 +14,10 @@ public class CommandLineTable {
     private String[] headers;
     private List<String[]> rows = new ArrayList<>();
     private boolean rightAlign;
+    private final PrintStream out;
 
-    public CommandLineTable() {
+    public CommandLineTable(PrintStream out) {
+    	this.out = out;
         setShowVerticalLines(false);
     }
 
@@ -32,7 +35,28 @@ public class CommandLineTable {
     }
 
     public void addRow(String... cells) {
-        rows.add(cells);
+    	List<String[]> linesList = new ArrayList<>();
+    	for (int c = 0; c < cells.length; c++) {
+			String colValue = cells[c];
+			String[] colLines = colValue.split("\n");
+			for (int l = 0; l < colLines.length; l++) {
+				String colLineValue = colLines[l];
+				String[] lineCells;
+				if(l < linesList.size()) {
+					lineCells = linesList.get(l);
+				} else {
+					lineCells = new String[cells.length];
+					for (int i = 0; i < lineCells.length; i++) {
+						lineCells[i] = "";
+					}
+					linesList.add(lineCells);
+				}
+				lineCells[c] = colLineValue;
+			}
+		}
+    	for (String[] lineCells : linesList) {
+    		rows.add(lineCells);
+		}
     }
 
     public void print() {
@@ -68,22 +92,22 @@ public class CommandLineTable {
         for (int i = 0; i < columnWidths.length; i++) {
             String line = String.join("", Collections.nCopies(columnWidths[i] +
                     verticalSep.length() + 1, HORIZONTAL_SEP));
-            System.out.print(joinSep + line + (i == columnWidths.length - 1 ? joinSep : ""));
+            out.print(joinSep + line + (i == columnWidths.length - 1 ? joinSep : ""));
         }
-        System.out.println();
+        out.println();
     }
 
     private void printRow(String[] cells, int[] maxWidths) {
         for (int i = 0; i < cells.length; i++) {
-            String s = cells[i];
+            String s = cells[i]==null?"":cells[i];
             String verStrTemp = i == cells.length - 1 ? verticalSep : "";
             if (rightAlign) {
-                System.out.printf("%s %" + maxWidths[i] + "s %s", verticalSep, s, verStrTemp);
+                out.printf("%s %" + maxWidths[i] + "s %s", verticalSep, s, verStrTemp);
             } else {
-                System.out.printf("%s %-" + maxWidths[i] + "s %s", verticalSep, s, verStrTemp);
+                out.printf("%s %-" + maxWidths[i] + "s %s", verticalSep, s, verStrTemp);
             }
         }
-        System.out.println();
+        out.println();
     }
     
 }

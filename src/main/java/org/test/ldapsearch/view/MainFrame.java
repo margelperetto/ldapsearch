@@ -3,7 +3,6 @@ package org.test.ldapsearch.view;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -50,8 +49,8 @@ public class MainFrame extends JFrame{
         lbCredentialsInfo.setForeground(Color.DARK_GRAY);
 
         panelCredentials.setLayout(new MigLayout(new LC().insets("5", "0", "0", "0")));
-        panelCredentials.add(jbLogout, new CC().gapLeft("5"));
-        panelCredentials.add(lbCredentialsInfo, new CC().gapLeft("5").wrap());
+        panelCredentials.add(lbCredentialsInfo, new CC().gapLeft("5"));
+        panelCredentials.add(jbLogout, new CC().gapRight("5").alignX("right").wrap());
         panelCredentials.add(new JSeparator(), new CC().spanX().width("100%"));
 
         card = new CardLayout();
@@ -64,8 +63,9 @@ public class MainFrame extends JFrame{
         add(panelCenter, BorderLayout.CENTER);
 
         pack();
-        setMinimumSize(new Dimension(800, 600));
+        setMinimumSize(getSize());
         setLocationRelativeTo(null);
+        setExtendedState(MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override

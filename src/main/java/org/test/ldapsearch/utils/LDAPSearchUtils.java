@@ -154,22 +154,31 @@ public final class LDAPSearchUtils {
         return map;
     }
 
-    public static Object getValue(List<SearchResult> results, String[] attributes, int r, int c) {
-        try {
-            return results.get(r).getAttributes().get(attributes[c]).get();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static String[][] getData(List<SearchResult> results, String[] attributes) {
         String[][] data = new String[results.size()][attributes.length];
         for (int r = 0; r < results.size(); r++) {
             for (int c = 0; c < attributes.length; c++) {
-                Object obj = LDAPSearchUtils.getValue(results, attributes, r, c);
-                data[r][c] = obj == null ? "" : obj.toString();
+                String v = getValue(results, attributes, r, c);
+                data[r][c] = v == null ? "" : v;
             }
         }
         return data;
+    }
+    
+    private static String getValue(List<SearchResult> results, String[] attributes, int r, int c) {
+        try {
+            NamingEnumeration<?> values = results.get(r).getAttributes().get(attributes[c]).getAll();
+            
+            StringBuilder sb = new StringBuilder();
+            while (values.hasMoreElements()) {
+            	if(sb.length()>0) {
+            		sb.append(" \n");
+            	}
+				sb.append(values.nextElement());
+			}
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
