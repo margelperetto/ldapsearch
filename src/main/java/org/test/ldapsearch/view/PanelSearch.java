@@ -37,6 +37,7 @@ import org.test.ldapsearch.view.actions.CollumnOrderingMouseListener;
 import org.test.ldapsearch.view.actions.SearchPropManager;
 import org.test.ldapsearch.view.comps.TextAreaCellEditor;
 import org.test.ldapsearch.view.comps.TextAreaCellRederer;
+import org.test.ldapsearch.view.comps.UndoRedoInstaller;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
@@ -97,7 +98,8 @@ public class PanelSearch extends JPanel{
 		jtaFilter.setWrapStyleWord(true);
 		jtaFilter.setLineWrap(true);
 		jtaFilter.setFont(jtfPath.getFont());
-		tmAttributes.addColumn("Atributes");
+		
+		tmAttributes.addColumn("Attributes");
 
 		btnSearch.addActionListener(evt->search());
 		btnSearch.setFont(btnSearch.getFont().deriveFont(Font.BOLD));
@@ -116,6 +118,9 @@ public class PanelSearch extends JPanel{
 		jtaPlainText.setBorder(new EmptyBorder(0, 0, 0, 0));
 
 		spPageSize.setEditor(new JSpinner.NumberEditor(spPageSize, "0"));
+		
+		UndoRedoInstaller.install(jtaFilter);
+		UndoRedoInstaller.install(jtfPath);
 	}
 
 	private JPanel createPanelPathAndFilter() {
@@ -186,6 +191,7 @@ public class PanelSearch extends JPanel{
 
 	public void reload() {
 		propManager.loadProperties();
+		UndoRedoInstaller.discardAllEdits();
 	}
 
 	public void setLdapContext(LdapContext ctx) {
