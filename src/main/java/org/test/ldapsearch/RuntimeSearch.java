@@ -28,13 +28,13 @@ public class RuntimeSearch {
     }
     
     private void showResults(List<SearchResult> results) {
-    	showResults(System.out, results, prop.getAttributes());
+    	String[] attrs = prop.getAttributes();
+    	String[][] data = LDAPSearchUtils.getData(results, attrs);
+    	showResults(System.out, data, attrs);
     }
     
-    public static void showResults(PrintStream out, List<SearchResult> results, String[] attrs) {
+    public static void showResults(PrintStream out, String[][] data, String[] attrs) {
         try {
-            String[][] data = LDAPSearchUtils.getData(results, attrs);
-            
             CommandLineTable st = new CommandLineTable(out);
             st.setHeaders(attrs);
             for (int i = 0; i < data.length; i++) {

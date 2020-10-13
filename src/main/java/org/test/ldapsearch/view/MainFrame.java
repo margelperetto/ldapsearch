@@ -85,7 +85,7 @@ public class MainFrame extends JFrame{
             }
             lbCredentialsInfo.setText("");
             jbLogout.setVisible(false);
-            panelSearch.clearTableData();
+            panelSearch.clearData();
             card.show(panelCenter, "LOGIN");
         } catch (Exception e) {
             e.printStackTrace();

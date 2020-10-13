@@ -38,6 +38,7 @@ import org.test.ldapsearch.view.actions.SearchPropManager;
 import org.test.ldapsearch.view.comps.TextAreaCellEditor;
 import org.test.ldapsearch.view.comps.TextAreaCellRederer;
 import org.test.ldapsearch.view.comps.UndoRedoInstaller;
+import org.test.ldapsearch.view.comps.search.PanelSearchInResults;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
@@ -61,6 +62,7 @@ public class PanelSearch extends JPanel{
 	private DefaultTableModel tmAttributes = new DefaultTableModel();
 	private JTable tableAttributtes = new JTable(tmAttributes);
 	private JTextArea jtaPlainText = new JTextArea();
+	private PanelSearchInResults panelSearchInResults = new PanelSearchInResults(this);
 	private AttributesManager attrManager = new AttributesManager(tableAttributtes);
 	private SearchPropManager propManager = new SearchPropManager(jtfPath, jtaFilter, spPageSize, attrManager);
 
@@ -84,9 +86,7 @@ public class PanelSearch extends JPanel{
 		JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, splitTop, panelResults);
 		splitCenter.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		JPanel panelFooter = new JPanel(new MigLayout(new LC().fillX().insetsAll("5")));
-		panelFooter.add(lbLastSearch);
-		panelFooter.add(lbCount, new CC().alignX("right"));
+		JPanel panelFooter = createFooter();
 
 		setLayout(new BorderLayout(0, 0));
 		add(splitCenter, BorderLayout.CENTER);
@@ -181,6 +181,7 @@ public class PanelSearch extends JPanel{
 		JTabbedPane tabViewMode = new JTabbedPane(JTabbedPane.BOTTOM);
 		tabViewMode.addTab("Table", new JScrollPane(tableResults));
 		tabViewMode.addTab("Plain Text", new JScrollPane(jtaPlainText));
+		tabViewMode.addChangeListener(evt->panelSearchInResults.setVisible(tabViewMode.getSelectedIndex()==0));
 
 		JPanel panelResults = new JPanel(new BorderLayout());
 		panelResults.setBorder(new EmptyBorder(5, 4, 0, 2));
@@ -188,7 +189,15 @@ public class PanelSearch extends JPanel{
 
 		return panelResults;
 	}
-
+	
+	private JPanel createFooter() {
+		JPanel panelFooter = new JPanel(new MigLayout(new LC().fillX().insetsAll("5")));
+		panelFooter.add(panelSearchInResults, new CC().width("35%"));
+		panelFooter.add(lbLastSearch, new CC().alignX("left").gapRight("15").split().spanX().alignX("right"));
+		panelFooter.add(lbCount, new CC().alignX("right"));
+		return panelFooter;
+	}
+	
 	public void reload() {
 		propManager.loadProperties();
 		UndoRedoInstaller.discardAllEdits();
@@ -236,14 +245,15 @@ public class PanelSearch extends JPanel{
 		}.execute();
 	}
 
-	public void clearTableData() {
+	public void clearData() {
 		tmResults.setDataVector(new Object[0][0], new Object[0]);
+		jtaPlainText.setText("");
 		updateCounter();
 	}
 
 	private void updateCounter() {
 		lbCount.setText("<html><b>Count:</b> "+tableResults.getRowCount()+" </html>");
-		lbLastSearch.setText("Last search: "+sdf.format(new Date()));
+		lbLastSearch.setText("<html><b>Last search:</b> "+sdf.format(new Date())+" </html>");
 		revalidate();
 	}
 
@@ -252,22 +262,23 @@ public class PanelSearch extends JPanel{
 			String[] attributes = attrManager.getAttributes();
 			String[][] data = LDAPSearchUtils.getData(results, attributes);
 			tmResults.setDataVector(data, attributes);
-			updateCounter();
-			showPlainTextResults(results, attributes);
+			showPlainTextResults(data, attributes);
 		}catch (Exception e) {
 			throw new RuntimeException("Error show results! "+e.getMessage(), e);
+		} finally {
+			updateCounter();
 		}
 	}
 
-	private void showPlainTextResults(List<SearchResult> results, String[] attributes) {
+	private void showPlainTextResults(String[][] data, String[] attributes) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			String utf8 = StandardCharsets.UTF_8.name();
 			try (PrintStream ps = new PrintStream(baos, true, utf8)) {
-				RuntimeSearch.showResults(ps, results, attributes);
+				RuntimeSearch.showResults(ps, data, attributes);
 			}
-			String data = baos.toString(utf8);
-			jtaPlainText.setText(data);
+			String strData = baos.toString(utf8);
+			jtaPlainText.setText(strData);
 			jtaPlainText.setCaretPosition(0);
 		} catch (Exception e) {
 			throw new RuntimeException("Error show plain text results! "+e.getMessage(), e);
@@ -276,6 +287,10 @@ public class PanelSearch extends JPanel{
 
 	public void save() {
 		propManager.saveProperties();
+	}
+
+	public JTable getTableResults() {
+		return tableResults;
 	}
 
 }
