@@ -4,6 +4,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.ByteArrayOutputStream;
@@ -12,11 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -51,6 +54,7 @@ public class PanelSearch extends JPanel{
 	private JTextArea jtaFilter = new JTextArea();
 	private JSpinner spPageSize = new JSpinner(new SpinnerNumberModel(0, 0, 999999, 1));
 	private JButton btnSearch = new JButton("Search!");
+	private JButton btnCancel = new JButton("X");
 	private JButton btnAdd = new JButton("Add+");
 	private JButton btnUp = new JButton("Up↑");
 	private JButton btnDown = new JButton("Down↓");
@@ -66,6 +70,7 @@ public class PanelSearch extends JPanel{
 	private AttributesManager attrManager = new AttributesManager(tableAttributtes);
 	private SearchPropManager propManager = new SearchPropManager(jtfPath, jtaFilter, spPageSize, attrManager);
 
+	private SwingWorker<List<SearchResult>, Integer> searchWorker;
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	private MainFrame frame;
 	private LdapContext ctx;
@@ -103,6 +108,12 @@ public class PanelSearch extends JPanel{
 
 		btnSearch.addActionListener(evt->search());
 		btnSearch.setFont(btnSearch.getFont().deriveFont(Font.BOLD));
+		
+		btnCancel.addActionListener(evt->cancelCurrentSearch());
+		btnCancel.setForeground(Color.RED.darker());
+		btnCancel.setFont(btnSearch.getFont());
+		btnCancel.setVisible(false);
+		btnCancel.setToolTipText("Cancel");
 
 		btnAdd.addActionListener(evt->attrManager.add());
 		btnRemove.addActionListener(evt->attrManager.removeSelecteds());
@@ -146,7 +157,8 @@ public class PanelSearch extends JPanel{
 		panelFilterScroll.setMinimumSize(new Dimension(0, jtfPath.getPreferredSize().height*3));
 
 		JPanel panelFilterFooter = new JPanel(new MigLayout(new LC().fillX().insetsAll("5")));
-		panelFilterFooter.add(btnSearch, new CC().alignY("bottom"));
+		panelFilterFooter.add(btnSearch, new CC().alignY("bottom").split(2).spanX(2));
+		panelFilterFooter.add(btnCancel, new CC().alignY("bottom"));
 		panelFilterFooter.add(panelPage, new CC().alignX("right"));
 
 		JPanel panelPathAndFilter = new JPanel(new BorderLayout(0, 0));
@@ -206,6 +218,12 @@ public class PanelSearch extends JPanel{
 	public void setLdapContext(LdapContext ctx) {
 		this.ctx = ctx;
 	}
+	
+	private void cancelCurrentSearch() {
+		if(searchWorker!=null && !searchWorker.isCancelled() && !searchWorker.isDone()) {
+			searchWorker.cancel(true);
+		}
+	}
 
 	private void search() {
 		if(ctx==null) {
@@ -219,7 +237,9 @@ public class PanelSearch extends JPanel{
 
 		btnSearch.setText("Searching...");
 		btnSearch.setEnabled(false);
-		new SwingWorker<List<SearchResult>, Integer>() {
+		btnCancel.setVisible(true);
+
+		searchWorker = new SwingWorker<List<SearchResult>, Integer>() {
 			@Override
 			protected List<SearchResult> doInBackground() throws Exception {
 				return LDAPSearchUtils.getSearchResults(ctx, path , filter, attributes, limit, this::publish);
@@ -231,18 +251,21 @@ public class PanelSearch extends JPanel{
 			@Override
 			protected void done() {
 				try {
-					List<SearchResult> results = get();
-					showResults(results);
+					showResults(get());
 					propManager.saveProperties();
+				} catch (CancellationException e) {
+					JOptionPane.showMessageDialog(PanelSearch.this, "Operation canceled!", "Cancel", JOptionPane.WARNING_MESSAGE);
 				} catch (Exception e) {
 					new ErrorModal(frame, e.getMessage(), e.getCause()!=null?e.getCause():e).setVisible(true);
 				} finally {
 					btnSearch.setText("Search!");
 					btnSearch.setEnabled(true);
 					btnSearch.requestFocus();
+					btnCancel.setVisible(false);
 				}
 			}
-		}.execute();
+		};
+		searchWorker.execute();
 	}
 
 	public void clearData() {
