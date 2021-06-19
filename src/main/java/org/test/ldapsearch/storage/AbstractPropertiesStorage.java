@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.Properties;
 
 public class AbstractPropertiesStorage<P extends PropKey> {
+	public static final String INSTALL_FOLDER = System.getProperty("user.home")+File.separator+".ldapsearch"+File.separator;
 
 	private final Properties properties;
     private String file;

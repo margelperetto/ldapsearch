@@ -1,10 +1,7 @@
 package org.test.ldapsearch.storage;
 
-import java.io.File;
-
 public class ConfigFileStorage extends AbstractPropertiesStorage<PropFileConfig>{
-
-	private static final String PROP_FILE = System.getProperty("user.home")+File.separator+".ldapsearch"+File.separator+"system.bd";
+	private static final String PROP_FILE = INSTALL_FOLDER+"system.bd";
 	
 	private static ConfigFileStorage instance;
 	

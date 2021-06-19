@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 
+import org.test.ldapsearch.storage.AbstractPropertiesStorage;
 import org.test.ldapsearch.storage.ConfigFileStorage;
 import org.test.ldapsearch.storage.PropFileConfig;
 import org.test.ldapsearch.storage.PropertiesStorage;
@@ -53,12 +54,16 @@ public class MenuBar extends JMenuBar{
         menuFile.add(menuItem("Clear Recent Files List", evt->clearRecentFiles()));
         menuFile.add(menuItem("Open Instalation Folder", evt->openInstallFolder()));        
     }
+    
+    private JFileChooser createFileChooser() {
+    	String current = PropertiesStorage.getInstance().getFile();
+        return new JFileChooser(current);
+    }
 
     private void newConfig() {
         try {
-            JFileChooser chooser = new JFileChooser(PropertiesStorage.DEFAULT_PROP_FILE);
+            JFileChooser chooser = createFileChooser();
             chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-            setCurrentConfigFile(chooser);
             int opt = chooser.showSaveDialog(mainFrame);
             if(opt == JFileChooser.APPROVE_OPTION) {
                 File newFile = chooser.getSelectedFile();
@@ -86,9 +91,8 @@ public class MenuBar extends JMenuBar{
 
     private void open() {
         try {
-            JFileChooser chooser = new JFileChooser(PropertiesStorage.DEFAULT_PROP_FILE);
+            JFileChooser chooser = createFileChooser();
             chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            setCurrentConfigFile(chooser);
             int opt = chooser.showOpenDialog(mainFrame);
             if(opt == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
@@ -103,31 +107,21 @@ public class MenuBar extends JMenuBar{
         }
     }
     
-    private void setCurrentConfigFile(JFileChooser chooser) throws Exception {
-        String selected = ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE);
-        if(selected!=null && !selected.trim().isEmpty()) {
-            chooser.setSelectedFile(new File(selected));
-        } else {
-            chooser.setSelectedFile(new File(PropertiesStorage.DEFAULT_PROP_FILE));
-        }
-    }
-
     private void save() {
         mainFrame.save();
     }
     
     private void saveAs() {
         try {
-            JFileChooser chooser = new JFileChooser(PropertiesStorage.DEFAULT_PROP_FILE);
+        	String current = PropertiesStorage.getInstance().getFile();
+            JFileChooser chooser = new JFileChooser(current);
             chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-            setCurrentConfigFile(chooser);
             int opt = chooser.showSaveDialog(mainFrame);
             if(opt == JFileChooser.APPROVE_OPTION) {
                 File newFile = chooser.getSelectedFile();
                 if(newFile.exists() && !overrideConfirm()) {
                     return;
                 }
-                String current = ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE);
                 Files.copy(new File(current).toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 addNewFileConfig(newFile.getAbsolutePath());
                 PropertiesStorage.setInstance(newFile.getAbsolutePath());
@@ -157,8 +151,8 @@ public class MenuBar extends JMenuBar{
     
     private void openInstallFolder() {
         try {
-            File defaultPropFile = new File(PropertiesStorage.DEFAULT_PROP_FILE);
-            Desktop.getDesktop().open(defaultPropFile.getParentFile());
+            File installFolder = new File(AbstractPropertiesStorage.INSTALL_FOLDER);
+			Desktop.getDesktop().open(installFolder );
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -167,13 +161,13 @@ public class MenuBar extends JMenuBar{
 
     private void loadRecentFiles() {
         try {
-            String current = ConfigFileStorage.getInstance().getProp(PropFileConfig.CONFIG_FILE);
+            String current = PropertiesStorage.getInstance().getFile();
             String[] history = ConfigFileStorage.getInstance().getPropArray(PropFileConfig.HISTORY);
             filesHistory = new HashSet<>();
             if(history!=null && history.length>0) {
                 filesHistory.addAll(Arrays.asList(history));
             } else {
-                filesHistory.add(current == null || current.trim().isEmpty()?PropertiesStorage.DEFAULT_PROP_FILE:current);
+                filesHistory.add(current);
             }
             int i = 1;
             for (String f : filesHistory) {
@@ -216,7 +210,7 @@ public class MenuBar extends JMenuBar{
     private void showAbout() {
         String msg = "LDAP Query Tool \n\n"
                 + "Version: \n"
-                + "    0.2-beta \n\n"
+                + "    0.3-beta \n\n"
                 + "Developer: \n"
                 + "    margel.peretto@gmail.com";
         JTextArea jta = new JTextArea(msg );
